@@ -201,25 +201,12 @@ function renderGame() {
 
 // Update Top Card 
 function updateTopCardDisplay() {
-  topCardEl.innerHTML = "";
-  const cardDiv = createCardElement(topCard);
-  topCardEl.appendChild(cardDiv);
-//   if (!topCard) return;
+     if (!topCard) return;
 
-//   const file = `${topCard.Color}_${topCard.DisplayValue}.png`.toLowerCase();
+    const fileName = `${topCard.Color.toLowerCase()}${topCard.Value}.png`;
+    topCardEl.src = `images/${fileName}`;
+    topCardEl.alt = topCard.DisplayValue;
 
-//   topCardEl.src = `images/cards/${file}`;
-// if (topCard.ImageUrl) {
-//     topCardEl.src = topCard.ImageUrl;
-//   } else {
-//     const cardStack = document.getElementById("card-stack");
-//     const existingCard = cardStack.querySelector('.top-card-display');
-//     if (existingCard) existingCard.remove();
-    
-//     const cardDiv = createCardElement(topCard);
-//     cardDiv.className += ' top-card-display';
-//     cardStack.appendChild(cardDiv);
-//   }
 }
 
 // Center Info (current player, color) 
@@ -229,76 +216,68 @@ function updateCenterInfo() {
   colorEl.style.backgroundColor = displayedColor.toLowerCase();
 }
 
-//  Render All Players 
+
 function renderAllPlayers() {
-  const gameBoard = document.getElementById("playersArea");
-  gameBoard.innerHTML = "";
-
-  for (const player of players) {
-    const playerDiv = document.createElement("div");
-    playerDiv.className = `player ${getPlayerPosition(player)}`;
-
-    const avatarImg = document.createElement("img");
-    avatarImg.src = selectedAvatars[players.indexOf(player) + 1];
-    avatarImg.className = "avatar";
-
-    const nameEl = document.createElement("div");
-    nameEl.className = "player-name";
-    nameEl.textContent = player;
-
- const drawBtn = document.createElement("button");
-    drawBtn.className = "draw-btn";
-    drawBtn.textContent = "Draw Card";
-    drawBtn.dataset.player = player;
-
-
-    const cardsDiv = document.createElement("div");
-    cardsDiv.className = "player-cards";
-
-    const playerCards = hands[player] || [];
-    playerCards.forEach((card) => {
-      const cardEl = createCardElement(card, player === currentPlayer);
-      cardsDiv.appendChild(cardEl);
-    });
-
-    playerDiv.appendChild(avatarImg);
-    playerDiv.appendChild(nameEl);
-    playerDiv.appendChild(cardsDiv);
-     playerDiv.appendChild(drawBtn);
-    gameBoard.appendChild(playerDiv);
-  }
+  const positions = ['player-bottom', 'player-top', 'player-left', 'player-right'];
+  
+  players.forEach((player, index) => {
+    const playerDiv = document.getElementById(positions[index]);
+    if (!playerDiv) return; 
+    
+    const nameEl = playerDiv.querySelector('.player-name');
+    if (nameEl) nameEl.textContent = player;
+    
+    const avatarImg = playerDiv.querySelector('.player-avatar');
+    if (avatarImg) avatarImg.src = selectedAvatars[index + 1];
+    
+    const drawBtn = playerDiv.querySelector('.draw-btn');
+    if (drawBtn) drawBtn.dataset.player = player;
+    
+    const cardsDiv = playerDiv.querySelector('.player-hand');
+    if (cardsDiv) {
+      cardsDiv.innerHTML = "";
+      const playerCards = hands[player] || [];
+      playerCards.forEach((card) => {
+        const cardEl = createCardElement(card, player === currentPlayer);
+        cardsDiv.appendChild(cardEl);
+      });
+    }
+  });
 }
 
 //  Create a Card Element 
 function createCardElement(card, isClickable = false) {
-  const div = document.createElement("div");
-  div.className = `card ${card.Color.toLowerCase()}`;
-  div.textContent = card.DisplayValue;
 
+  const img = document.createElement("img");
+  
+  const fileName = `${card.Color.toLowerCase()}${card.Value}.png`;
+  img.src = `images/${fileName}`;
+  img.alt = card.DisplayValue;
+  img.className = "card-image";
+  
   if (isClickable) {
-    div.classList.add("clickable");
-    // div.addEventListener("click", () => playCard(card));
-  div.addEventListener("click", () => {
-  if (card.Color === "WILD" || card.Color === "BLACK") {
-  handleWildCard(card);
-} else {
-  playCard(card);
-}
-});
-}
+    img.classList.add("clickable");
+    img.addEventListener("click", () => {
+      if (card.Color === "WILD" || card.Color === "BLACK") {
+        handleWildCard(card);
+      } else {
+        playCard(card);
+      }
+    });
+  }
 
-  return div;
+  return img;
 }
 
 //  Draw Pile Click Setup 
 function setupDrawPileClick() {
-  const drawPile = document.getElementById("discardPile");
+  const drawPile = document.getElementById("drawPile");
   drawPile.onclick = async () => {
     if (currentPlayer === "") return;
     await drawCard(currentPlayer);
   };
 }
-
+ 
 //  Draw Card Button Setup 
 function setupPlayerDrawButtons() {
   const drawButtons = document.querySelectorAll(".draw-btn");
@@ -338,7 +317,8 @@ async function playCard(card) {
 async function drawCard(player) {
   try {
     const res = await fetch(
-      `${baseUrl}/Draw/${gameId}?playerName=${encodeURIComponent(player)}`
+      `${baseUrl}/Draw/${gameId}?playerName=${encodeURIComponent(player)}`,
+        { method: "PUT" } 
     );
     const data = await res.json();
 
@@ -374,8 +354,20 @@ function showColorPicker(onColorSelect) {
 }
 
   async function handleWildCard(card) {
-  showColorPicker(async (color) => {
-    await playCard(card, color);
+   showColorPicker(async (color) => {
+    const body = { gameId, playerName: currentPlayer, card, chosenColor: color };
+    const res = await postJson(`${baseUrl}/Play`, body);
+
+    if (res.IsSuccess) {
+      topCard = res.TopCard;
+      currentColor = displayedColor = color;
+      currentPlayer = res.NextPlayer;
+      await updateHands();
+      renderGame();
+      if (res.GameOver) handleGameOver(res);
+    } else {
+      showServerAlert(res.Message, "#ffcc00");
+    }
   });
 }
 
