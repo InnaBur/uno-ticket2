@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNO Game</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ----------------- SETUP ----------------- -->
+<div id="setup">
+  <h1 id="welcome">Welcome to UNO!</h1>
+  
+  <div class="input-container">
+    <!-- Player name fields -->
+    <div class="input-wrapper"><input id="player1" placeholder="Player 1"></div>
+    <div class="input-wrapper"><input id="player2" placeholder="Player 2"></div>
+    <div class="input-wrapper"><input id="player3" placeholder="Player 3"></div>
+    <div class="input-wrapper"><input id="player4" placeholder="Player 4"></div>
+
+    <!-- Avatar introduction section -->
+    <div class="avatar-intro">
+      <h3>Meet Your UNO Characters</h3>
+      <div class="avatar-container">
+        <div class="avatar-card">
+          <img src="avatars/avatar1.png" class="avatar-option">
+          <p>Lucky Red</p>
+        </div>
+        <div class="avatar-card">
+          <img src="avatars/avatar2.png" class="avatar-option">
+          <p>Ocean Blue</p>
+        </div>
+        <div class="avatar-card">
+          <img src="avatars/avatar3.png" class="avatar-option">
+          <p>Power Green</p>
+        </div>
+        <div class="avatar-card">
+          <img src="avatars/avatar4.png" class="avatar-option">
+          <p>Wild Yellow</p>
+        </div>
+      </div>
+    </div>
+
+    <button id="startBtn">Start Game</button>
+  </div>
+</div>
+
+<!-- ----------------- GAME ----------------- -->
+<div id="game">
+  <div id="center">
+    <div id="card-stack">
+      <div id="topCard"></div> 
+    <!-- <img id="topCard" src="images/back.png" alt="Top Card"> -->
+    <img id="discardPile" src="images/back0.png" alt="Discard Pile"> <!-- also drawPile. Same location -->
+    </div>
+    <div id="center-info">
+      <div id="currentPlayer"></div>
+      <div id="color-container">
+        <span id="color-label">Color:</span>
+        <div id="currentColor"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="player-bottom" class="player">
+  <div class="player-info">
+    <div class="player-name"></div>
+    <div class="player-avatar-container">
+      <img class="player-avatar" />
+    </div>
+     <div class="player-points"></div>
+         <button class="draw-btn" data-player="">Draw Card</button> 
+
+  </div>
+ 
+  <div class="player-hand"></div>
+</div>
+
+<div id="player-top" class="player">
+  <div class="player-info">
+    <div class="player-name"></div>
+    <div class="player-avatar-container">
+      <img class="player-avatar" />
+    </div>
+     <div class="player-points"></div>
+              <button class="draw-btn" data-player="">Draw Card</button> 
+
+  </div>
+ 
+  <div class="player-hand"></div>
+</div>
+
+<div id="player-left" class="player">
+  <div class="player-info">
+    <div class="player-name"></div>
+    <div class="player-avatar-container">
+      <img class="player-avatar" />
+    </div>
+     <div class="player-points"></div>
+              <button class="draw-btn" data-player="">Draw Card</button> 
+
+  </div>
+ 
+  <div class="player-hand"></div>
+</div>
+
+<div id="player-right" class="player">
+  <div class="player-info">
+     
+    <div class="player-name"></div>
+    <div class="player-avatar-container">
+      <img class="player-avatar" />
+    </div>
+     <div class="player-points"></div>
+              <button class="draw-btn" data-player="">Draw Card</button> 
+
+  </div>
+  <div class="player-hand"></div>
+</div>
+
+  <div id="controls">
+     <button id="unoBtn">UNO!</button>
+  </div>
+</div>
+
+<!-- ----------------- MODALS ----------------- -->
+<div id="gameOverModal">
+  <canvas id="fireworksCanvas"></canvas>
+  <div id="modalContent">
+    <div id="winnerText"></div>
+    <div id="scoresText"></div>
+    <button id="restartBtn">Restart Game</button>
+  </div>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>

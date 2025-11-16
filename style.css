@@ -1,0 +1,629 @@
+/* ----------------- BODY ----------------- */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)),
+    /* white transparent overlay */
+    url('images/uno-back-mixed.jpg') top center / cover no-repeat;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* ----------------- SETUP ----------------- */
+#setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 40%;
+  min-height: 90%;
+  padding: 30px;
+  text-align: center;
+  background-color: rgba(189, 243, 205, 0.6);
+  /* semi-transparent green */
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(54, 50, 50, 0.5);
+  gap: 30px;
+}
+
+#welcome {
+  font-size: 4rem;
+  color: #ffcc00;
+  animation: welcomePulse 1.5s infinite alternate;
+  margin-bottom: 30px;
+  background-color: rgba(0, 0, 0, 0.35);
+  /* semi-transparent box */
+  padding: 25px 60px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  display: inline-block;
+}
+
+/* ----------------- INPUTS ----------------- */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  max-width: 400px;
+
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: rgba(43, 35, 35, 0.6);
+
+}
+
+.input-wrapper input {
+  width: 80%;
+  padding: 12px;
+  font-size: 1.3rem;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+  text-align: center;
+}
+
+/* ----------------- AVATARS ----------------- */
+.avatar-intro {
+  display: flex;
+  flex-direction: column;
+  /* stack title + avatars vertically */
+  align-items: center;
+  gap: 15px;
+  /* space between h3 and avatar row */
+  border-radius: 25px;
+  padding: 20px 40px;
+  text-align: center;
+  margin-top: 20px;
+  background-color: rgba(43, 35, 35, 0.6);
+}
+
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  /* space between avatars */
+  flex-wrap: wrap;
+
+}
+
+.avatar-option {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.avatar-option:hover {
+  transform: scale(2.8);
+  border: 6px solid #fff;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+}
+
+.avatar-card p {
+  margin-top: 12px;
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+/* ----------------- START BUTTON ----------------- */
+#startBtn {
+  padding: 20px 60px;
+  font-weight: bold;
+  font-size: 1.9rem;
+  border-radius: 16px;
+  border: solid;
+  background-color: #ffea03;
+  color: black;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-block;
+  z-index: 1001;
+  margin-top: 30px;
+}
+
+#startBtn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+/* ----------------- GAME ----------------- */
+#game {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+   background:
+    linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+    /* white transparent overlay */
+    url('images/uno-back-mixed.jpg') top center / cover no-repeat;
+}
+
+
+/* ----------------- CENTER AREA ----------------- */
+#center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  gap: 15px;
+  text-align: center;
+}
+
+#topCard {
+  width: 140px;
+  height: 210px;
+  border-radius: 10px;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+#center-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: rgba(75, 0, 130, 0.9);
+  padding: 15px 25px;
+  border-radius: 12px;
+  /* Neon glow effect */
+  border: 2px solid rgba(186, 85, 211, 0.8);
+  /* light purple border */
+  box-shadow:
+    0 0 5px rgba(186, 85, 211, 0.8),
+    0 0 10px rgba(186, 85, 211, 0.7),
+    0 0 20px rgba(186, 85, 211, 0.6),
+    0 0 40px rgba(186, 85, 211, 0.5),
+    0 0 80px rgba(186, 85, 211, 0.4);
+
+  color: white;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.6),
+    0 0 10px rgba(186, 85, 211, 0.8);
+
+  animation: neonFlicker 2s ease-in-out infinite alternate;
+}
+
+
+/* ----------------- COLOR INFO ----------------- */
+
+#color-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#color-label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: rgb(246, 225, 255);
+  text-shadow: 0 0 8px #000;
+  text-align: center;
+  animation: glow 2.5s infinite alternate;
+}
+
+#currentPlayer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: rgb(246, 225, 255);
+  text-shadow: 0 0 8px #000;
+  text-align: center;
+  animation: glow 2.5s infinite alternate;
+}
+
+#currentColor {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+
+#fireworksCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/*----------------- SERVER ALERT AND OVERLAY----------------- */
+.server-alert {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  padding: 20px 30px;
+  border: 3px solid #fff;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  text-align: center;
+  z-index: 9999;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  opacity: 1;
+  animation: pop 0.3s ease-out;
+  transition: opacity 0.5s;
+}
+
+.server-alert.fade-out {
+  opacity: 0;
+}
+
+.blink-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 0, 0, 0.4);
+  z-index: 9998;
+  pointer-events: none;
+  animation: blinkRed 0.3s ease-in-out 3;
+  animation-iteration-count: 3;
+  /* ensures it blinks 3 times */
+}
+
+/* ---- UNO RULES BUTTON -----*/
+#unoRulesLink {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #ffd700;
+  /* bright yellow */
+  color: #000;
+  /* black text for contrast */
+  padding: 12px 25px;
+  border-radius: 12px;
+  text-decoration: none;
+  /* remove underline */
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  z-index: 100;
+  /* always on top */
+}
+
+#unoRulesLink:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+
+#restartBtn {
+  padding: 20px 60px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, #bdf3cd, #ffcc00); /* green → yellow */
+  color: #000;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  display: inline-block;
+  z-index: 10000;
+  margin-top: 20px;
+}
+
+/* Hover and active effects */
+#restartBtn:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, #a2e3b1, #ffd700); /* brighter hover */
+  box-shadow: 0 10px 25px rgba(255, 204, 0, 0.6);
+}
+
+#restartBtn:active {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* ----------------- PLAYERS ----------------- */
+
+.player-info {
+  display: flex;
+  align-items: center; /* vertically center the name and avatar */
+  gap: 8px; /* space between name and avatar */
+  margin-bottom: 4px;
+}
+
+
+.player {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 17px;
+}
+
+.player-name {
+  font-weight: bold;
+  font-size: larger;
+  color: #ffcc00;
+  margin-bottom: 5px;
+  text-align: center;
+  padding: 3px 7px;
+  background-color: rgba(0, 0, 0, 0.5); /* dark, very transparent */
+                   /* some space around text/cards */
+  border-radius: 12px;                  /* rounded corners */
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);  /* subtle shadow for depth */
+  backdrop-filter: blur(2px);           /* optional slight blur for better readability */
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.player-avatar-container {
+  width: 90px;
+  height: 90px;
+}
+
+.player-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%; /* optional circular avatar */
+}
+
+.player-points {
+  font-size: 1.2rem;
+  font-weight: bold;
+   color: #ffcc00;
+  margin-bottom: 5px;
+  text-align: center;
+  padding: 3px 7px;
+  background-color: rgba(0, 0, 0, 0.5); /* dark, very transparent */
+                   /* some space around text/cards */
+  border-radius: 12px;                  /* rounded corners */
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);  /* subtle shadow for depth */
+  backdrop-filter: blur(2px);           /* optional slight blur for better readability */
+  -webkit-backdrop-filter: blur(2px);
+}
+
+ /* === PLAYER HAND BASE === */
+.player-hand {
+  display: flex;
+  justify-content: center; /* distribute cards evenly */
+  align-items: flex-end;
+  flex-wrap: wrap;             /* allows new rows */
+   padding: 6px;       /* reduce top/bottom padding */
+  gap: 3px;           /* reduce space between cards */
+  
+  
+  background-color: rgba(0,0,0,0.25);
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
+
+
+   max-width: 600px;        /* limit width so hand stays in quadrant */
+  min-height: 50px;        /* ensure enough height for 2 rows */
+}
+
+.player-hand img {
+  flex: 0 1 45px;          /* fixed width cards, shrink slightly if needed */
+  max-width: 70px;
+  height: auto;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.25s ease, width 0.25s ease;
+  flex-shrink: 0;              /* prevent shrinking below set width */
+  flex:1 0 12%;              /* base width of 12% of container */
+}
+
+
+.player-hand img:hover {
+  transform: translateY(-10px) scale(1.2);
+  z-index: 10;
+}
+
+
+/* === PLAYER CIRCLE POSITIONS === */
+#player-top {
+  position: absolute;
+  top: 1%; 
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#player-bottom {
+  position: absolute;
+  bottom: 1%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#player-left {
+  position: absolute;
+  top: 50%;
+  left: 1%;
+  transform: translateY(-50%);
+}
+
+#player-right {
+  position: absolute;
+  top: 50%;
+  right: 1%;
+  transform: translateY(-50%);
+}
+
+.active {
+  transform: scale(1.05);  /* slightly smaller than before */
+  background-color: rgba(246, 225, 255, 0.4);
+  border-radius: 12px;
+  padding: 8px 12px;       /* reduce horizontal padding */
+  min-width: 150px;        /* smaller so hand stays inside quadrant */
+  box-shadow:
+    0 0 15px 5px rgba(190, 76, 185, 0.6),
+    0 0 30px 10px rgba(151, 86, 148, 0.5),
+    0 0 45px 15px rgba(164, 60, 160, 0.4);
+  animation: activeVioletGlow 1.5s infinite alternate;
+  z-index: 10; /* make sure it’s above hand cards but below center */
+}
+
+
+#card-stack {
+  display: flex;
+  gap: 20px;           
+  align-items: center; 
+}
+
+#card-stack img {
+  width: 120px;                 /* same width for both */
+  height: 180px;                /* same height for both */
+  cursor: pointer;              /* pointer for interaction */
+}
+
+#discardPile {
+  width: 80px;
+  height: 120px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+  cursor: pointer;     /* optional: clickable for drawing a card */
+  transition: transform 0.6s;
+}
+
+#discardPile:hover {
+  transform: scale(1.2);
+}
+
+
+
+/* -------- KEYFRAMES ------ */
+
+@keyframes activeVioletGlow {
+  0% {
+    box-shadow:
+      0 0 15px 5px rgba(190, 76, 185, 0.5),
+      0 0 30px 10px rgba(151, 86, 148, 0.4),
+      0 0 45px 15px rgba(164, 60, 160, 0.3);
+  }
+  100% {
+    box-shadow:
+      0 0 25px 8px rgba(190, 76, 185, 0.9),
+      0 0 50px 16px rgba(151, 86, 148, 0.8),
+      0 0 70px 25px rgba(164, 60, 160, 0.6);
+  }
+}
+
+@keyframes activePlayerGlow {
+  50% { box-shadow: 0 0 20px #ffd700; }
+  100% { box-shadow: 0 0 50px #ffd700; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); text-shadow: 0 0 20px #fff,0 0 40px #ff0,0 0 60px #ffcc00; }
+  100% { transform: scale(1.1); text-shadow: 0 0 40px #fff,0 0 80px #ff0,0 0 120px #ffcc00; }
+}
+
+/* Animation: Karte fliegt auf Ablagestapel */
+@keyframes moveToDiscard {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+    z-index: 1000;
+  }
+  50% {
+    transform: translate(50px, -50px) rotate(20deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blinkRed {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px #ffd700;
+  }
+
+  100% {
+    text-shadow: 0 0 20px #ffd700;
+  }
+}
+
+@keyframes welcomePulse {
+  0% {
+    transform: scale(1);
+    color: #ffcc00;
+  }
+
+  100% {
+    transform: scale(1.1);
+    color: #ffd700;
+  }
+}
+
+
+@keyframes neonFlicker {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 5px rgba(186, 85, 211, 0.8),
+      0 0 10px rgba(186, 85, 211, 0.7),
+      0 0 20px rgba(186, 85, 211, 0.6),
+      0 0 40px rgba(186, 85, 211, 0.5),
+      0 0 80px rgba(186, 85, 211, 0.4);
+  }
+
+  50% {
+    box-shadow:
+      0 0 10px rgba(186, 85, 211, 1),
+      0 0 20px rgba(186, 85, 211, 0.9),
+      0 0 40px rgba(186, 85, 211, 0.8),
+      0 0 80px rgba(186, 85, 211, 0.7),
+      0 0 120px rgba(186, 85, 211, 0.6);
+  }
+}
+
+
+
