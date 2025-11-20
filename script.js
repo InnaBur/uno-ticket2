@@ -25,6 +25,7 @@ let displayedColor = "";
 let topCard = null;
 let hands = {};
 let isInitialDeal = true;
+let playDirection = 1;
 
 const selectedAvatars = {
   1: "avatars/avatar1.png",
@@ -138,7 +139,7 @@ async function startGame() {
 
   players = playerInputs.map((input, i) => {
     const name = input.value.trim();
-    return (name !== "" ? name : defaultNames[i]).toUpperCase();
+    return (name !== "" ? name : defaultNames[i]).trim().toUpperCase();   // 🔥 додано .trim()
   });
   if (!validatePlayers(players)) {
     showServerAlert("Enter 4 different player names!", "#ffcc00");
@@ -146,32 +147,43 @@ async function startGame() {
   }
 
   try {
-     isInitialDeal = true;
+    isInitialDeal = true;
     const data = await postJson(`${baseUrl}/Start`, players);
     initializeGameState(data);
 
-        await updateTopCard();
     await updateHands();
 
     toggleSetupGameUI();
     showServerAlert("Dealind...", "#4caf50");
     setTimeout(() => {
-  
+
       renderGame();
       setTimeout(() => {
-        isInitialDeal = false; 
+        isInitialDeal = false;
       }, 2000);
     }, 500);
   } catch (err) {
     showServerAlert("Error starting game: " + err.message, "#ff4444");
   }
+
+  renderGame();
 }
 
 function initializeGameState(data) {
   gameId = data.Id;
-  currentPlayer = data.NextPlayer;
-  topCard = data.TopCard;
-  currentColor = displayedColor = topCard.Color;
+
+  currentPlayer = data.NextPlayer
+    ? data.NextPlayer.trim().toUpperCase()
+    : "";
+
+  if (data.TopCard) {
+    topCard = data.TopCard;
+    currentColor = displayedColor = topCard.Color;
+  } else {
+    topCard = null;
+    currentColor = displayedColor = "";
+    console.warn("Top card not returned from server!");
+  }
 }
 
 function toggleSetupGameUI() {
@@ -186,7 +198,7 @@ async function updateHands() {
       `${baseUrl}/GetCards/${gameId}?playerName=${encodeURIComponent(player)}`
     );
     const data = await res.json();
-      console.log(`Cards for ${player}:`, data.Cards);
+    console.log(`Cards for ${player}:`, data.Cards);
     hands[player] = data.Cards;
   }
 }
@@ -205,7 +217,10 @@ document.body.appendChild(rulesLink);
 ========================================================== */
 
 function renderGame() {
-  if (!topCard) return;
+  if (!topCard) {
+    console.warn("Cannot render game: topCard not defined");
+    return;
+  }
   updateTopCardDisplay();
   updateCenterInfo();
   setupDrawPileClick();
@@ -213,7 +228,11 @@ function renderGame() {
   renderAllPlayers();
 }
 
-
+function getNextPlayer() {
+    const currentIndex = players.indexOf(currentPlayer);
+    const nextIndex = (currentIndex + 1) % players.length;
+    return players[nextIndex];
+}
 
 function updateTopCardDisplay() {
   if (!topCard) return;
@@ -224,7 +243,7 @@ function updateTopCardDisplay() {
 
 }
 
-// Update Top Card 
+//Update Top Card 
 async function updateTopCard() {
   try {
     const res = await fetch(`${baseUrl}/TopCard/${gameId}`);
@@ -236,11 +255,27 @@ async function updateTopCard() {
   }
 }
 
+function updateTopCardDisplay() {
+  if (!topCard) return;
+  const fileName = `${topCard.Color.toLowerCase()}${topCard.Value}.png`;
+  topCardEl.src = `images/${fileName}`;
+  topCardEl.alt = topCard.DisplayValue || `${topCard.Color} ${topCard.Value}`;
+}
+
 // Center Info (current player, color) 
 function updateCenterInfo() {
   currentPlayerEl.textContent = `Current Player: ${currentPlayer}`;
   colorEl.textContent = `Current Color: ${displayedColor}`;
-  colorEl.style.backgroundColor = displayedColor.toLowerCase();
+  // colorEl.style.backgroundColor = displayedColor.toLowerCase();
+  if (displayedColor) {
+    try {
+      colorEl.style.backgroundColor = displayedColor.toLowerCase();
+    } catch (e) {
+      colorEl.style.backgroundColor = "transparent";
+    }
+  } else {
+    colorEl.style.backgroundColor = "transparent";
+  }
 }
 
 
@@ -260,7 +295,9 @@ function renderAllPlayers() {
     const drawBtn = playerDiv.querySelector('.draw-btn');
     if (drawBtn) drawBtn.dataset.player = player;
 
-    if (player === currentPlayer) {
+     const isCurrentPlayer = player === currentPlayer;
+
+    if (isCurrentPlayer) {
       playerDiv.classList.add('active');
     } else {
       playerDiv.classList.remove('active');
@@ -273,12 +310,7 @@ function renderAllPlayers() {
       const isCurrentPlayer = player === currentPlayer;
 
       playerCards.forEach((card, cardIndex) => {
-        const cardEl = createCardElement(
-          card,
-          isCurrentPlayer,
-          cardIndex,
-          isCurrentPlayer
-        );
+        const cardEl = createCardElement(card, isCurrentPlayer, cardIndex, isCurrentPlayer);
         cardsDiv.appendChild(cardEl);
       });
     }
@@ -294,38 +326,38 @@ function createCardElement(card, isClickable = false, cardIndex = 0, showFront =
 
     const fileName = `${card.Color.toLowerCase()}${card.Value}.png`;
     img.src = `images/${fileName}`;
-    img.alt = card.DisplayValue;
     img.className = "card-image card-front";
   } else {
     img.src = `images/back0.png`;
     img.className = "card-image card-back";
   }
 
-  img.alt = card.DisplayValue;
+  img.alt = card.DisplayValue || `${card.Color} ${card.Value}`;
 
   //animation with timeout
-   if (isInitialDeal) {
-  img.style.animation = `dealCard 1s ease-out ${cardIndex * 0.1}s both`;
+  if (isInitialDeal) {
+    img.style.animation = `dealCard 1s ease-out ${cardIndex * 0.1}s both`;
 
-  setTimeout(() => {
-    img.style.animation = '';
-      img.style.transform = showFront ? 'rotateY(0deg)' : 'rotateY(180deg)';
+    setTimeout(() => {
+      img.style.animation = '';
+      img.style.transform = showFront ? "rotateY(0deg)" : "rotateY(180deg)";
     }, 1000 + (cardIndex * 100));
   } else {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        img.style.transform = showFront ? 'rotateY(0deg)' : 'rotateY(180deg)';
-      });
-    });
-   }
+    img.style.transform = showFront ? "rotateY(0deg)" : "rotateY(180deg)";
+  }
 
-  if (isClickable) {
+
+  if (isClickable && showFront) {
     img.classList.add("clickable");
     img.addEventListener("click", () => {
+      if (currentPlayer === "" || !players.includes(currentPlayer)) {
+        showServerAlert("Invalid current player", "#ffcc00");
+        return;
+      }
       if (card.Color === "WILD" || card.Color === "BLACK") {
         handleWildCard(card);
       } else {
-        playCard(card);
+        playCard(currentPlayer, card);
       }
     });
   }
@@ -342,7 +374,7 @@ function setupDrawPileClick() {
     return;
   }
   drawPile.onclick = async () => {
-    if (currentPlayer === "") return;
+    if (!currentPlayer) return;
     await drawCard(currentPlayer);
   };
 }
@@ -353,44 +385,83 @@ function setupPlayerDrawButtons() {
   drawButtons.forEach((btn) => {
     btn.onclick = async () => {
       const player = btn.dataset.player;
+      if (player !== currentPlayer) {
+        showServerAlert("It's not your turn to draw.", "#ffcc00");
+        return;
+      }
       await drawCard(player);
     };
   });
 }
 
 //  PLAY CARD 
-async function playCard(card, wildColor = null) {
-  if (currentPlayer === "") return;
+async function playCard(player, card, wildColor = null) {
+    if (player !== currentPlayer) {
+    showServerAlert("It's not your turn!", "#ffcc00");
+    return;
+  }
+
+  // if (!currentPlayer) return;
+
+  // const playerHand = hands[currentPlayer] || [];
+  // if (!playerHand.find(c => c.Value === card.Value && c.Color === card.Color)) {
+  //   showServerAlert("You cannot play a card you don't have!", "#ffcc00");
+  //   return;
+  // }
+   const playerHand = hands[player] || [];
+  if (!playerHand.find(c => c.Value === card.Value && c.Color === card.Color)) {
+    showServerAlert("You cannot play a card you don't have!", "#ffcc00");
+    return;
+  }
+
   try {
+   
+
+
     const finalWildColor = wildColor || card.Color;
 
     let url = `${baseUrl}/PlayCard/${gameId}?value=${card.Value}&color=${card.Color}&wildColor=${finalWildColor}`;
-   
 
-     console.log("Playing card URL:", url);
+    console.log("Playing card URL:", url);
 
     const res = await fetch(
-      url, { 
+      url, {
       method: "PUT",
       headers: {
         'Content-Type': 'application/json'
       }
-     });
-    const data = await res.json();
+    });
 
-    if (data) {
-      showServerAlert(`${currentPlayer} played ${card.DisplayValue}!`);
-      await updateTopCard();
-
-      currentPlayer = data.NextPlayer;
-    
-      await updateHands();
-      renderGame();
-
-      if (data.GameOver) handleGameOver(data);
-    } else {
-      showServerAlert(data.Message, "#ffcc00");
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Server returned ${res.status} ${res.statusText} ${text}`);
     }
+    const data = await res.json();
+    if (!data) {
+      showServerAlert("No response from server", "#ffcc00");
+      return;
+    }
+
+    if (data.Message) {
+      showServerAlert(data.Message, "#ffcc00");
+      return;
+    }
+    if (data.TopCard) {
+      topCard = data.TopCard;
+      currentColor = displayedColor = topCard.Color;
+    } else {
+      await updateTopCard();
+    }
+    await updateHands();
+currentPlayer = getNextPlayer();
+    // if (data.NextPlayer) {
+    //   currentPlayer = data.NextPlayer.trim().toUpperCase();
+    // }
+    renderGame();
+    showServerAlert(`${currentPlayer} played ${card.DisplayValue || `${card.Color} ${card.Value}`}!`);
+
+    if (data.GameOver) handleGameOver(data);
+
   } catch (err) {
     showServerAlert("Error playing card: " + err.message, "#ff4444");
   }
@@ -399,31 +470,43 @@ async function playCard(card, wildColor = null) {
 //  DRAW CARD LOGIC 
 async function drawCard(player) {
   try {
-const url = `${baseUrl}/DrawCard/${gameId}?playerName=${encodeURIComponent(player)}`;
-    console.log("Drawing card URL:", url); 
+    if (player !== currentPlayer) {
+      showServerAlert("You can draw only on your turn.", "#ffcc00");
+      return;
+    }
+
+    const url = `${baseUrl}/DrawCard/${gameId}?playerName=${encodeURIComponent(player)}`;
+    console.log("Drawing card URL:", url);
     const res = await fetch(
       url,
       { method: "PUT" }
     );
 
-     if (!res.ok) {
+    if (!res.ok) {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
 
     const data = await res.json();
-console.log("Draw card response:", data);
+    console.log("Draw card response:", data);
 
-    if (data) {
-      showServerAlert(`${player} drew a card`);
-        if (data.NextPlayer) {
-        currentPlayer = data.NextPlayer;
-      }
-      await updateTopCard();
-      await updateHands();
-      renderGame();
-    } else {
-      showServerAlert(data.Message, "#ffcc00");
+    if (!data) {
+      showServerAlert("No response from server", "#ffcc00");
+      return;
     }
+    if (data.Message) {
+      showServerAlert(data.Message, "#ffcc00");
+      return;
+    }
+    showServerAlert(`${player} drew a card`);
+
+    await updateHands();
+    await updateTopCard();
+
+    if (data.NextPlayer) {
+      currentPlayer = data.NextPlayer.trim().toUpperCase();
+    }
+    renderGame();
+
   } catch (err) {
     showServerAlert("Error drawing card: " + err.message, "#ff4444");
   }
@@ -450,7 +533,7 @@ function showColorPicker(onColorSelect) {
 
 async function handleWildCard(card) {
   showColorPicker(async (color) => {
-    await playCard(card, color);  
+    await playCard(currentPlayer, card, color);
   });
 }
 
@@ -459,7 +542,7 @@ async function handleWildCard(card) {
 async function restartGame() {
   modal.style.display = "none";
   resetGameState();
-   isInitialDeal = true; 
+  isInitialDeal = true;
   setupEl.style.display = "block";
   gameEl.style.display = "none";
   playerInputs.forEach(input => input.value = "");
